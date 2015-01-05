@@ -19,7 +19,7 @@ package com.pasviegas.firekka
 import akka.actor.ActorSystem
 import com.firebase.client.Firebase
 import com.pasviegas.firekka.FirebaseRootActor.props
-import com.typesafe.config.Config
+import com.typesafe.config.{ Config, ConfigFactory }
 
 sealed class Firekka(actorSystem: ActorSystem, firebase: Firebase) {
 
@@ -36,6 +36,8 @@ sealed class Firekka(actorSystem: ActorSystem, firebase: Firebase) {
 
 object Firekka {
   val firebaseUri: String = "akka.firekka.firebase.root"
+
+  def config(url: String) = ConfigFactory.parseString(s"""${Firekka.firebaseUri}="$url"""")
 
   def system(name: String, config: Config): Firekka = {
     if (!config.hasPath(firebaseUri)) {
