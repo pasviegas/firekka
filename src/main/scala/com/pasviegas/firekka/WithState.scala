@@ -16,24 +16,25 @@
 
 package com.pasviegas.firekka
 
-import akka.actor.Actor
-import com.firebase.client.{ DataSnapshot, Firebase }
+import com.firebase.client.DataSnapshot
 
-abstract class FirebaseActor(firebase: Firebase) extends Actor {
+import scala.util.{ Failure, Try }
 
-  private[this] val eventListener = FirebaseEventListener(self)
+trait WithState[T] {
 
-  override def preStart(): Unit = firebase.addChildEventListener(eventListener)
+  var state: Option[T] = None
 
-  override def postStop(): Unit = firebase.removeEventListener(eventListener)
-
-  protected def attachChildren[T <: FirebaseActor](ds: DataSnapshot, factory: FirebaseActorCreator[T]) =
-    context.actorOf(FirebaseRootActor.props(firebase.child(ds.getKey), factory.create), ds.getKey)
-
-  protected def log(event: String, ds: DataSnapshot): Unit =
-    log(event)(ds.getValue)
-
-  protected def log[T](event: String)(value: T): Unit =
-    println(s"${self.path} $event: $value")
+  def updateState(ds: DataSnapshot)(implicit decoder: DataSnapshotDecoder[T]): Try[T] = ds.getKey match {
+    case "state" =>
+      val decode = decoder.decode(ds)
+      state = decode.toOption
+      decode
+    case _ => Failure(new StateRootNotFound())
+  }
 }
 
+trait DataSnapshotDecoder[T] {
+  def decode(ds: DataSnapshot): Try[T]
+}
+
+class StateRootNotFound() extends Exception
