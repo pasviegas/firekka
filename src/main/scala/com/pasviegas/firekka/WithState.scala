@@ -16,9 +16,13 @@
 
 package com.pasviegas.firekka
 
+import java.util
+
 import com.firebase.client.DataSnapshot
 
 import scala.util.{ Failure, Try }
+
+import scala.collection.JavaConverters._
 
 trait WithState[T] {
 
@@ -31,6 +35,16 @@ trait WithState[T] {
       decode
     case _ => Failure(new StateRootNotFound())
   }
+}
+
+object State {
+  def apply(cc: Product): util.Map[String, util.Map[String, Any]] =
+    Map("state" -> toMap(cc).asJava).asJava
+
+  def toMap(cc: Product): Map[String, Any] =
+    cc.getClass.getDeclaredFields
+      .map(_.getName)
+      .zip(cc.productIterator.to).toMap
 }
 
 trait DataSnapshotDecoder[T] {
