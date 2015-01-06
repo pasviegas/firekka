@@ -18,13 +18,10 @@ package com.pasviegas.firekka.actors
 
 import akka.actor.Props
 import com.firebase.client.{ DataSnapshot, Firebase }
-import com.pasviegas.firekka.actors.firebase.FirebaseEvents
-import FirebaseEvents.{ Added, Changed, Removed }
-import org.apache.commons.logging.LogFactory
+import com.pasviegas.firekka.actors.firebase.FirebaseEvents.{ Added, Changed, Removed }
 
 class FirebaseLogActor(firebase: Firebase) extends FirebaseActor(firebase) {
 
-  val logger = LogFactory.getLog(classOf[FirebaseLogActor])
   var content = Map[String, String]()
 
   override def receive: Receive = {
@@ -35,13 +32,13 @@ class FirebaseLogActor(firebase: Firebase) extends FirebaseActor(firebase) {
   }
 
   override def postStop(): Unit = {
-    logger.info(s"${self.path} is dying")
+    log.info(s"is dying")
     super.postStop()
   }
 
   private[this] def cacheAndPrint(event: String, ds: DataSnapshot) {
     content += (ds.getKey -> ds.getValue(true).toString)
-    log(event, ds)
+    logEvent(event, ds)
   }
 
 }

@@ -16,15 +16,14 @@
 
 package com.pasviegas.firekka.actors
 
-import akka.actor.Actor
+import akka.actor.{ Actor, ActorLogging }
 import com.firebase.client.{ DataSnapshot, Firebase }
 import com.pasviegas.firekka.actors.firebase.FirebaseEventListener
 import com.pasviegas.firekka.actors.support.FirebaseActorCreator
-import org.apache.commons.logging.LogFactory
 
-abstract class FirebaseActor(firebase: Firebase) extends Actor {
+abstract class FirebaseActor(firebase: Firebase)
+    extends Actor with ActorLogging {
 
-  private[this] val logger = LogFactory.getLog(classOf[FirebaseActor])
   private[this] val eventListener = FirebaseEventListener(self)
 
   override def preStart(): Unit = firebase.addChildEventListener(eventListener)
@@ -34,10 +33,10 @@ abstract class FirebaseActor(firebase: Firebase) extends Actor {
   protected def attachChildren[T <: FirebaseActor](ds: DataSnapshot, factory: FirebaseActorCreator[T]) =
     context.actorOf(FirebaseRootActor.props(firebase.child(ds.getKey), factory.create), ds.getKey)
 
-  protected def log(event: String, ds: DataSnapshot): Unit =
-    log(event)(ds.getValue)
+  protected def logEvent(event: String, ds: DataSnapshot): Unit =
+    logEvent(event)(ds.getValue)
 
-  protected def log[T](event: String)(value: T): Unit =
-    logger.info(s"${self.path} $event: $value")
+  protected def logEvent[T](event: String)(value: T): Unit =
+    log.info(s"${event.capitalize}($value)")
 }
 
