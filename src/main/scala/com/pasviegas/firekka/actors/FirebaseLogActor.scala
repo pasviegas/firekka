@@ -14,14 +14,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package com.pasviegas.firekka
+package com.pasviegas.firekka.actors
 
 import akka.actor.Props
 import com.firebase.client.{ DataSnapshot, Firebase }
-import com.pasviegas.firekka.FirebaseEvents.{ Added, Changed, Removed }
+import com.pasviegas.firekka.actors.firebase.FirebaseEvents
+import FirebaseEvents.{ Added, Changed, Removed }
+import org.apache.commons.logging.LogFactory
 
 class FirebaseLogActor(firebase: Firebase) extends FirebaseActor(firebase) {
 
+  val logger = LogFactory.getLog(classOf[FirebaseLogActor])
   var content = Map[String, String]()
 
   override def receive: Receive = {
@@ -32,7 +35,7 @@ class FirebaseLogActor(firebase: Firebase) extends FirebaseActor(firebase) {
   }
 
   override def postStop(): Unit = {
-    println(s"${self.path} is dying")
+    logger.info(s"${self.path} is dying")
     super.postStop()
   }
 

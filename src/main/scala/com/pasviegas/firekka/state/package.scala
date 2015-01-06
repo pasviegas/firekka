@@ -16,24 +16,28 @@
 
 package com.pasviegas.firekka
 
-import akka.actor.ActorRef
-import com.firebase.client.{ ChildEventListener, DataSnapshot, FirebaseError }
-import com.pasviegas.firekka.FirebaseEvents.{ Added, Changed, Removed }
+import com.firebase.client.{ DataSnapshot, Firebase }
 
-object FirebaseEventListener {
-  def apply(actor: ActorRef): ChildEventListener = new ChildEventListener {
-    override def onChildRemoved(dataSnapshot: DataSnapshot): Unit =
-      actor ! Removed(dataSnapshot)
+import scala.language.implicitConversions
+import scala.util.Try
 
-    override def onChildAdded(dataSnapshot: DataSnapshot, s: String): Unit =
-      actor ! Added(dataSnapshot)
+package object state {
 
-    override def onChildChanged(dataSnapshot: DataSnapshot, s: String): Unit =
-      actor ! Changed(dataSnapshot)
+  class StateRootNotFound() extends Exception
 
-    override def onChildMoved(dataSnapshot: DataSnapshot, s: String): Unit = {}
+  trait DataSnapshotDecoder[T] {
+    def decode(ds: DataSnapshot): Try[T]
+  }
 
-    override def onCancelled(firebaseError: FirebaseError): Unit = {}
+  class FirebaseOps(firebase: Firebase) {
+    def setState(cc: Product): Unit =
+      firebase.setValue(State(cc))
+
+    def pushChild(cc: Product): Unit =
+      firebase.push().setValue(State(cc))
+  }
+
+  implicit def firebaseOps(firebase: Firebase): FirebaseOps = {
+    new FirebaseOps(firebase)
   }
 }
-

@@ -14,28 +14,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package com.pasviegas.firekka
+package com.pasviegas.firekka.state
 
 import java.util
 
-import com.firebase.client.DataSnapshot
-
-import scala.util.{ Failure, Try }
-
 import scala.collection.JavaConverters._
-
-trait WithState[T] {
-
-  var state: Option[T] = None
-
-  def updateState(ds: DataSnapshot)(implicit decoder: DataSnapshotDecoder[T]): Try[T] = ds.getKey match {
-    case "state" =>
-      val decode = decoder.decode(ds)
-      state = decode.toOption
-      decode
-    case _ => Failure(new StateRootNotFound())
-  }
-}
 
 object State {
   def apply(cc: Product): util.Map[String, util.Map[String, Any]] =
@@ -46,9 +29,3 @@ object State {
       .map(_.getName)
       .zip(cc.productIterator.to).toMap
 }
-
-trait DataSnapshotDecoder[T] {
-  def decode(ds: DataSnapshot): Try[T]
-}
-
-class StateRootNotFound() extends Exception

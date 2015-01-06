@@ -14,23 +14,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package com.pasviegas
+package com.pasviegas.firekka.state
 
-import com.firebase.client.Firebase
+import com.firebase.client.DataSnapshot
 
-import scala.language.implicitConversions
+import scala.util.{ Failure, Try }
 
-package object firekka {
+trait WithState[T] {
 
-  class FirebaseOps(firebase: Firebase) {
-    def setState(cc: Product): Unit =
-      firebase.setValue(State(cc))
+  var state: Option[T] = None
 
-    def pushChild(cc: Product): Unit =
-      firebase.push().setValue(State(cc))
-  }
-
-  implicit def firebaseOps(firebase: Firebase): FirebaseOps = {
-    new FirebaseOps(firebase)
+  def updateState(ds: DataSnapshot)(implicit decoder: DataSnapshotDecoder[T]): Try[T] = ds.getKey match {
+    case "state" =>
+      val decode = decoder.decode(ds)
+      state = decode.toOption
+      decode
+    case _ => Failure(new StateRootNotFound())
   }
 }
+

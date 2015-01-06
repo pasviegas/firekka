@@ -14,10 +14,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package com.pasviegas.firekka
+package com.pasviegas.firekka.actors.support
 
 import akka.actor.Props
 import com.firebase.client.Firebase
+import com.pasviegas.firekka.actors.FirebaseActor
 
 trait FirebaseActorCreator[T <: FirebaseActor] {
 

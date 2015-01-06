@@ -18,7 +18,9 @@ package com.pasviegas.firekka
 
 import akka.actor.ActorSystem
 import com.firebase.client.Firebase
-import com.pasviegas.firekka.FirebaseRootActor.props
+import com.pasviegas.firekka.actors.FirebaseActor
+import com.pasviegas.firekka.actors.FirebaseRootActor.props
+import com.pasviegas.firekka.actors.support.FirebaseActorCreator
 import com.typesafe.config.{ Config, ConfigFactory }
 
 sealed class Firekka(actorSystem: ActorSystem, firebase: Firebase) {

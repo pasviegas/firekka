@@ -14,11 +14,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package com.pasviegas.firekka
+package com.pasviegas.firekka.actors
 
 import akka.actor.{ ActorSelection, PoisonPill, Props }
 import com.firebase.client.{ DataSnapshot, Firebase }
-import com.pasviegas.firekka.FirebaseEvents.{ Added, Removed }
+import com.pasviegas.firekka.actors.firebase.FirebaseEvents
+import FirebaseEvents.{ Added, Removed }
 
 class FirebaseRootActor[T <: FirebaseActor](firebase: Firebase, factory: (Firebase => Props))
     extends FirebaseActor(firebase) {

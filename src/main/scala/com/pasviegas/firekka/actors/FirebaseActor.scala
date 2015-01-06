@@ -14,13 +14,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package com.pasviegas.firekka
+package com.pasviegas.firekka.actors
 
 import akka.actor.Actor
 import com.firebase.client.{ DataSnapshot, Firebase }
+import com.pasviegas.firekka.actors.firebase.FirebaseEventListener
+import com.pasviegas.firekka.actors.support.FirebaseActorCreator
+import org.apache.commons.logging.LogFactory
 
 abstract class FirebaseActor(firebase: Firebase) extends Actor {
 
+  private[this] val logger = LogFactory.getLog(classOf[FirebaseActor])
   private[this] val eventListener = FirebaseEventListener(self)
 
   override def preStart(): Unit = firebase.addChildEventListener(eventListener)
@@ -34,6 +38,6 @@ abstract class FirebaseActor(firebase: Firebase) extends Actor {
     log(event)(ds.getValue)
 
   protected def log[T](event: String)(value: T): Unit =
-    println(s"${self.path} $event: $value")
+    logger.info(s"${self.path} $event: $value")
 }
 
