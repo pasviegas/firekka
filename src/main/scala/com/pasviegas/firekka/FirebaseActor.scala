@@ -17,7 +17,7 @@
 package com.pasviegas.firekka
 
 import akka.actor.Actor
-import com.firebase.client.Firebase
+import com.firebase.client.{ DataSnapshot, Firebase }
 
 abstract class FirebaseActor(firebase: Firebase) extends Actor {
 
@@ -26,6 +26,12 @@ abstract class FirebaseActor(firebase: Firebase) extends Actor {
   override def preStart(): Unit = firebase.addChildEventListener(eventListener)
 
   override def postStop(): Unit = firebase.removeEventListener(eventListener)
+
+  protected def attachChildren[T <: FirebaseActor](ds: DataSnapshot, factory: FirebaseActorCreator[T]) =
+    context.actorOf(FirebaseRootActor.props(firebase.child(ds.getKey), factory.create), ds.getKey)
+
+  protected def log(event: String, ds: DataSnapshot) =
+    println(s"${self.path} $event: ${ds.getValue}")
 
 }
 

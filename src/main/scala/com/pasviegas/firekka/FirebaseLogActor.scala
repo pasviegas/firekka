@@ -38,7 +38,7 @@ class FirebaseLogActor(firebase: Firebase) extends FirebaseActor(firebase) {
 
   private[this] def cacheAndPrint(event: String, ds: DataSnapshot) {
     content += (ds.getKey -> ds.getValue(true).toString)
-    println(s"${self.path} $event: $content")
+    log(event, ds)
   }
 
 }

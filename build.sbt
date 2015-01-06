@@ -2,6 +2,8 @@ import scalariform.formatter.preferences._
 
 name := """firekka"""
 
+organization := "com.pasviegas"
+
 version := "1.0-SNAPSHOT"
 
 scalaVersion := "2.11.4"

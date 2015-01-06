@@ -37,7 +37,7 @@ sealed class Firekka(actorSystem: ActorSystem, firebase: Firebase) {
 object Firekka {
   val firebaseUri: String = "akka.firekka.firebase.root"
 
-  def config(url: String) = ConfigFactory.parseString(s"""${Firekka.firebaseUri}="$url"""")
+  def config(url: String): Config = ConfigFactory.parseString(s"""${Firekka.firebaseUri}="$url"""")
 
   def system(name: String, config: Config): Firekka = {
     if (!config.hasPath(firebaseUri)) {
